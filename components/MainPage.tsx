@@ -15,8 +15,8 @@ export default function MainPage() {
         .
       </h1>
       <h2 className="mx-auto mt-12 max-w-xl text-lg sm:text-gray-400  text-gray-500 leading-7">
-        Decentralised picture generation sites don't collect any information
-        from you!
+        Decentralised picture generation sites don&apos;t collect any
+        information from you!
       </h2>
       <Link
         className="bg-blue-600 rounded-xl text-white font-medium px-4 py-3 sm:mt-10 mt-8 hover:bg-blue-500 transition"
