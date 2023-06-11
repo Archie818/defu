@@ -5,19 +5,19 @@ import { useState } from "react";
 import Head from "next/head";
 import { generateImages } from "./api/imageAPI";
 
-const modelDescriptions = {
-  eastern: "Eastern Style",
-  western: "Western Style",
-  comic: "Comic Style",
-  cute: "Cute Style",
+const modelDescriptions: { [key: string]: string } = {
+  eastern: "Eastern style",
+  western: "Western style",
+  comic: "Comic style",
+  cute: "Cute style",
 };
 
 export default function HomePage() {
-  const [model, setModel] = useState(null); // For storing model selection
+  const [model, setModel] = useState<any>(null);
   const [prompt, setPrompt] = useState(""); // For storing input prompt
   const [negativePrompt, setNegativePrompt] = useState(""); // For storing input prompt
   const [numberImages, setNumberImages] = useState(4); // For storing number of images to generate
-  const [images, setImages] = useState([]); // For storing generated images
+  const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,31 +48,25 @@ export default function HomePage() {
     setSelectedImage(null);
   };
 
-  // Handle form submit
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    // Generate images based on prompt
-    const newImages = await generateImages(
+    const base64Images = await generateImages(
       prompt,
       negativePrompt,
       numberImages,
       model
     );
-    // console.log("newImages:", newImages);
-    if (newImages) {
-      newImages.forEach((image, index) => {
-        // Prepend base64 image format string
-        const base64ImageString = "data:image/png;base64," + image;
-
-        // Assuming image is now a correct base64 encoded string
+    if (base64Images) {
+      const blobUrls: string[] = base64Images.map((base64Image) => {
+        const base64ImageString = "data:image/png;base64," + base64Image;
         const parts = base64ImageString.split(",", 2);
         const imageType = parts[0].split(":")[1].split(";")[0];
         const imageBlob = base64toBlob(parts[1], imageType);
-        const imageUrl = URL.createObjectURL(imageBlob);
-        newImages[index] = imageUrl;
+        const blobUrl = URL.createObjectURL(imageBlob);
+        return blobUrl;
       });
-      setImages(newImages);
+      setImages(blobUrls);
     } else {
       alert("Error generating images");
     }
