@@ -6,7 +6,7 @@ type ModelType = "eastern" | "western" | "comic" | "cute" | null;
 
 const modelMapping = {
   eastern: "bra_v5.safetensors [ac68270450]",
-  western: "cyberrealistic_v31.safetensors [107d2a241b]",
+  western: "realisticVisionV20_v20NoVAE.safetensors [c0d1994c73]",
   comic: "lyriel_v16.safetensors [ec6f68ea63]",
   cute: "chilloutmix_NiPrunedFp32Fix.safetensors [fc2511737a]",
 };
