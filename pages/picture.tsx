@@ -1,9 +1,13 @@
 import Footer from "@/components/Footer";
 import Header from "../components/Header";
 import { BeatLoader } from "react-spinners";
-import { useState } from "react";
 import Head from "next/head";
 import { generateImages } from "./api/imageAPI";
+import { useWeb3 } from "@/components/Web3Context";
+import React, { useContext } from "react";
+import { useAccount, useConnect, useEnsName, useNetwork } from "wagmi";
+import { useState, useEffect } from "react";
+import { UserContext } from "@/components/UserContext";
 
 const modelDescriptions: { [key: string]: string } = {
   eastern: "Eastern style",
@@ -20,6 +24,31 @@ export default function HomePage() {
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { address, isConnected } = useAccount();
+
+  const { fetchUserData, user, incrementPicsGenerated } =
+    useContext(UserContext) || {};
+
+  useEffect(() => {
+    if (address && fetchUserData) {
+      fetchUserData(address);
+    }
+  }, [address, fetchUserData]);
+  // console.log("user:", user);
+
+  const isVipUser = user?.isVipUser;
+  const picsGenerated = user?.picsGenerated;
+  // console.log("isVipUser:", isVipUser);
+  // console.log("picsGenerated:", picsGenerated);
+
+  const canGenerate = isConnected && (isVipUser || (picsGenerated ?? 0) < 10);
+
+  // useEffect(() => {
+  //   console.log("address:", address);
+  //   console.log("isConnected:", isConnected);
+  //   console.log("___________");
+  // }, [address, isConnected]);
 
   const base64toBlob = (base64Data: string, contentType = "") => {
     const byteCharacters = atob(base64Data);
@@ -67,6 +96,10 @@ export default function HomePage() {
         return blobUrl;
       });
       setImages(blobUrls);
+      // After successfully generating images
+      if (typeof incrementPicsGenerated === "function") {
+        incrementPicsGenerated();
+      }
     } else {
       alert("Error generating images");
     }
@@ -196,10 +229,10 @@ export default function HomePage() {
           <div className="flex justify-center mt-4">
             <button
               className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-1/2 ${
-                isLoading ? "cursor-not-allowed" : ""
+                isLoading || !canGenerate ? "cursor-not-allowed" : ""
               }`}
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !canGenerate}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-3">
@@ -207,8 +240,10 @@ export default function HomePage() {
                   {/* Adjust size and color as per your needs */}
                   <span>Generating...</span>
                 </div>
-              ) : (
+              ) : isVipUser ? (
                 "Generate"
+              ) : (
+                `Generate (${10 - (picsGenerated ?? 0)} remaining)`
               )}
             </button>
           </div>{" "}
