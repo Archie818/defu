@@ -1,9 +1,11 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, ReactNode, useCallback } from "react";
+import { useLocalStorage } from "./localStorage";
 
 interface UserContextProps {
   user: {
     isVipUser: boolean;
     picsGenerated: number;
+    lastUpdated: string;
   } | null;
   fetchUserData: (address: string) => Promise<void>;
   incrementPicsGenerated: () => void;
@@ -16,28 +18,34 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<{
-    isVipUser: boolean;
-    picsGenerated: number;
-  } | null>(null);
+  const VIP_USERS = ["0x47fc3417213161efa7eeabd22b30286103c7fa25"];
 
-  // Function to update user's data
-  // You would typically fetch this data from your back-end
-  const fetchUserData = async (address: string) => {
-    // Replace the following code with your actual API call
+  const [localUser, setLocalUser] = useLocalStorage("user", null);
+
+  const fetchUserData = useCallback(async (address: string) => {
+    const userFromLocalStorage = JSON.parse(
+      window.localStorage.getItem("user") || "{}"
+    );
+    const currentDate = new Date().toISOString().split("T")[0];
+    const lastUpdated = userFromLocalStorage.lastUpdated || "";
+    const isSameDay = currentDate === lastUpdated;
     const fetchedUserData = {
-      isVipUser: false, // get this data from your back-end
-      picsGenerated: 0, // get this data from your back-end
+      isVipUser: VIP_USERS.includes(address.toLowerCase()),
+      picsGenerated: isSameDay ? userFromLocalStorage.picsGenerated : 0,
+      lastUpdated: currentDate,
     };
-    setUser(fetchedUserData);
-  };
+    setLocalUser(fetchedUserData);
+  }, []);
 
-  // Function to increment the number of pics generated
-  // You would typically update this data in your back-end
   const incrementPicsGenerated = () => {
-    setUser((prevState) => {
+    setLocalUser((prevState: any) => {
       if (prevState) {
-        return { ...prevState, picsGenerated: prevState.picsGenerated + 1 };
+        const updatedUser = {
+          ...prevState,
+          picsGenerated: prevState.picsGenerated + 1,
+        };
+        window.localStorage.setItem("user", JSON.stringify(updatedUser));
+        return updatedUser;
       } else {
         return null;
       }
@@ -46,7 +54,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, fetchUserData, incrementPicsGenerated }}
+      value={{ user: localUser, fetchUserData, incrementPicsGenerated }}
     >
       {children}
     </UserContext.Provider>

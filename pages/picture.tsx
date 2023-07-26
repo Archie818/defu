@@ -27,17 +27,28 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount();
 
-  const { user, incrementPicsGenerated } = useContext(UserContext) || {};
+  const { fetchUserData, user, incrementPicsGenerated } =
+    useContext(UserContext) || {};
+
+  useEffect(() => {
+    if (address && fetchUserData) {
+      fetchUserData(address);
+    }
+  }, [address, fetchUserData]);
+  // console.log("user:", user);
+
   const isVipUser = user?.isVipUser;
   const picsGenerated = user?.picsGenerated;
+  // console.log("isVipUser:", isVipUser);
+  // console.log("picsGenerated:", picsGenerated);
 
   const canGenerate = isConnected && (isVipUser || (picsGenerated ?? 0) < 10);
 
-  useEffect(() => {
-    console.log("address:", address);
-    console.log("isConnected:", isConnected);
-    console.log("___________");
-  }, [address, isConnected]);
+  // useEffect(() => {
+  //   console.log("address:", address);
+  //   console.log("isConnected:", isConnected);
+  //   console.log("___________");
+  // }, [address, isConnected]);
 
   const base64toBlob = (base64Data: string, contentType = "") => {
     const byteCharacters = atob(base64Data);
@@ -229,8 +240,10 @@ export default function HomePage() {
                   {/* Adjust size and color as per your needs */}
                   <span>Generating...</span>
                 </div>
-              ) : (
+              ) : isVipUser ? (
                 "Generate"
+              ) : (
+                `Generate (${10 - (picsGenerated ?? 0)} remaining)`
               )}
             </button>
           </div>{" "}
