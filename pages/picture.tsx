@@ -3,7 +3,6 @@ import Header from "../components/Header";
 import { BeatLoader } from "react-spinners";
 import Head from "next/head";
 import { generateImages } from "./api/imageAPI";
-import { useWeb3 } from "@/components/Web3Context";
 import React, { useContext } from "react";
 import { useAccount, useConnect, useEnsName, useNetwork } from "wagmi";
 import { useState, useEffect } from "react";

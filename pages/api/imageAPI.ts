@@ -5,8 +5,8 @@ interface Image {
 type ModelType = "eastern" | "western" | "comic" | "cute" | null;
 
 const modelMapping = {
-  eastern: "bra_v5.safetensors [ac68270450]",
-  western: "realisticVisionV20_v20NoVAE.safetensors [c0d1994c73]",
+  eastern: "beautifulRealistic_v60.safetensors [bc2f30f4ad]",
+  western: "realisticVisionV50_v50VAE.safetensors [d7fc69397d]",
   comic: "lyriel_v16.safetensors [ec6f68ea63]",
   cute: "chilloutmix_NiPrunedFp32Fix.safetensors [fc2511737a]",
 };
