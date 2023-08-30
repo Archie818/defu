@@ -7,6 +7,7 @@ import React, { useContext } from "react";
 import { useAccount, useConnect, useEnsName, useNetwork } from "wagmi";
 import { useState, useEffect } from "react";
 import { UserContext } from "@/components/UserContext";
+import Link from "next/link";
 
 const modelDescriptions: { [key: string]: string } = {
   eastern: "Eastern style",
@@ -158,6 +159,12 @@ export default function HomePage() {
       {/* prompt Area */}
       <div className="flex flex-1 w-3/4 p-4 rounded-lg shadow-md flex-col items-center">
         <h2 className="text-lg font-bold mb-4 text-center">Enter Prompt</h2>
+        <Link
+          className="text-sm font-bold mb-4 text-center underline text-gray-400"
+          href="/samples"
+        >
+          View Samples
+        </Link>
         <form onSubmit={handleSubmit} className="w-full">
           <div className="mb-4">
             <label
